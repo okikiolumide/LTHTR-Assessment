@@ -1,0 +1,67 @@
+global:
+  auth:
+    existingSecret: postgres-secret
+    secretKeys:
+        adminPasswordKey: postgresql-password
+        replicationPasswordKey: postgresql-replication-password
+
+architecture: replication  
+
+primary:
+  podSecurityContext:
+    enabled: true
+    fsGroup: 1001
+  containerSecurityContext:
+    enabled: true
+    runAsUser: 1001
+    runAsNonRoot: true
+    readOnlyRootFilesystem: true
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
+    seccompProfile:
+      type: RuntimeDefault
+  livenessProbe:
+    enabled: true
+  readinessProbe:
+    enabled: true
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 1
+      memory: 1Gi
+
+readReplicas:
+  replicaCount: 2
+  podAntiAffinityPreset: hard
+  persistence:
+    enabled: true
+    size: 200Gi
+
+  livenessProbe:
+    enabled: true
+  readinessProbe:
+    enabled: true
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 1
+      memory: 1Gi  
+
+tls:
+  enabled: true
+  certificatesSecret: certificates-tls-secret
+  certFilename: cert.crt
+  certKeyFilename: cert.key
+
+volumePermissions:
+  enabled: true
+
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true

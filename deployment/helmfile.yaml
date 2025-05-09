@@ -1,0 +1,25 @@
+helmDefaults:
+  timeout: 600
+releases:
+- name: external-secrets
+  chart: external-secrets/external-secrets
+  namespace: external-secrets
+  createNamespace: true
+  values:
+    - ./values/external-secrets.yaml
+
+- name: postgres
+  chart: bitnami/postgres
+  namespace: postgres
+  createNamespace: true
+  needs:
+    - external-secrets/external-secrets
+  version: 16.7.0
+  values:
+    - ./values/postgres.yaml
+
+repositories:
+- name: bitnami
+  url: https://charts.bitnami.com/bitnami
+- name: external-secrets
+  url: https://charts.external-secrets.io
